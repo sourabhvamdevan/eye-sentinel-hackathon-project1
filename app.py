@@ -2,6 +2,7 @@
 
 import streamlit as st
 import os
+import urllib.request
 import numpy as np
 from PIL import Image
 import tensorflow as tf
@@ -79,10 +80,24 @@ with st.sidebar:
 st.markdown('<p class="main-title">👁️ EYESENTINEL</p>', unsafe_allow_html=True)
 st.markdown('<p class="sub-title">AI-Powered Retinal Triage & Advanced Disease Diagnosis System</p>', unsafe_allow_html=True)
 
-# Model Loader using Functional API to prevent Keras 3 graph tracing errors
+# Cloud Model Downloader & Loader using Functional API
 @st.cache_resource
 def load_trained_model():
-    model_path = "models/eye_disease_model.h5"
+    model_dir = "models"
+    model_path = os.path.join(model_dir, "eye_disease_model.h5")
+    
+    if not os.path.exists(model_path):
+        os.makedirs(model_dir, exist_ok=True)
+      
+        cloud_model_url = "https://drive.google.com/drive/folders/1bp5PMZ9BTn2t_3q4ImJ1qVG7zdrSDQN4?usp=sharing"
+        
+        with st.spinner("Downloading diagnostic model weights from secure cloud storage..."):
+            try:
+                urllib.request.urlretrieve(cloud_model_url, model_path)
+            except Exception as e:
+                st.error(f"Failed to download model weights from cloud: {e}")
+                return None
+
     if os.path.exists(model_path):
         inputs = tf.keras.Input(shape=(256, 256, 3))
         x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', name='conv2d_0')(inputs)
@@ -226,12 +241,12 @@ elif selected_view == "Diagnostic Workspace":
                             if prediction > 0.5:
                                 conf = prediction * 100
                                 diag_status = "High Risk: Glaucoma Indicator"
-                                st.error(f"🚨 **High Risk Detected: Glaucoma Indicator**")
+                                st.error("🚨 **High Risk Detected: Glaucoma Indicator**")
                                 st.metric(label="Risk Probability Score", value=f"{conf:.2f}%")
                             else:
                                 conf = (1 - prediction) * 100
                                 diag_status = "Low Risk: Normal Retinal Scan"
-                                st.success(f"✅ **Low Risk: Normal Retinal Scan**")
+                                st.success("✅ **Low Risk: Normal Retinal Scan**")
                                 st.metric(label="Confidence Score", value=f"{conf:.2f}%")
                         else:
                             diag_status = "Multiclass: Glaucoma Risk (72.4%)"
@@ -259,7 +274,7 @@ elif selected_view == "Diagnostic Workspace":
                                 type="primary"
                             )
                 else:
-                    st.warning("Model artifact (`models/eye_disease_model.h5`) not found.")
+                    st.warning("Model could not be loaded. Please check cloud model URL configuration.")
         else:
             st.info("Awaiting fundus image upload to initiate diagnostic simulation...")
 
