@@ -1,0 +1,94 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>System Architecture - Glaucoma Screening & Triage System</title>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #38bdf8;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #94a3b8;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+        }
+        .flow-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .card {
+            background-color: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+        }
+        .card h3 {
+            color: #38bdf8;
+            margin-top: 0;
+            font-size: 1.1rem;
+            border-bottom: 1px solid #1f2937;
+            padding-bottom: 10px;
+        }
+        .card p {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .arrow {
+            text-align: center;
+            font-size: 1.5rem;
+            color: #38bdf8;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>EYESENTINEL Architecture</h1>
+        <div class="subtitle">AI-Powered Retinal Triage & Glaucoma Screening System Flow</div>
+        
+        <div class="flow-grid">
+            <div class="card">
+                <h3>1. Ingestion & Prep</h3>
+                <p>Loads retinal fundus images from the Kaggle dataset repository, structures metadata using Pandas, and initializes data generators.</p>
+            </div>
+            <div class="card">
+                <h3>2. Deep Learning Core</h3>
+                <p>Custom 3-layer Convolutional Neural Network (CNN) trained with binary cross-entropy loss, achieving 91.27% validation accuracy.</p>
+            </div>
+            <div class="card">
+                <h3>3. Presentation Layer</h3>
+                <p>Streamlit-powered cyber-dark interactive dashboard equipped with live image uploader and real-time clinical probability scoring.</p>
+            </div>
+        </div>
+
+        <div class="arrow">↓</div>
+
+        <div class="card" style="text-align: center;">
+            <h3>Cloud Deployment Pipeline (Render)</h3>
+            <p>Orchestrated via <code>Procfile</code> and <code>requirements.txt</code> with safe weight deserialization to ensure seamless production execution.</p>
+        </div>
+    </div>
+</body>
+</html>

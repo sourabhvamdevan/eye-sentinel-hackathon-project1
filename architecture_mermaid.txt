@@ -1,0 +1,16 @@
+
+graph TD
+    A[Kaggle Dataset: Fondo de Ojo] -->|DataFrame & Image Paths| B(Data Preprocessing Pipeline)
+    B -->|Train/Validation Split| C(Custom CNN Model Training)
+    C -->|Model Weights & Architecture| D[Model Artifact: models/eye_disease_model.h5]
+    
+    subgraph Deployment & Execution
+        D -->|Weights Loading| E[Streamlit Web App: app.py]
+        E -->|Cloud Deployment| F[Render Platform]
+    end
+
+    subgraph User Interface Workflow
+        G[User Uploads Fundus Image] --> E
+        E -->|Resize & Normalize| H[TensorFlow Inference Engine]
+        H -->|Sigmoid Probability Score| I[Clinical Triage Output & Risk Assessment]
+    end
