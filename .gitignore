@@ -123,7 +123,6 @@ venv.bak/
 
 # Model artifacts and large datasets (Crucial for ML/AI projects)
 models/
-*.h5
 *.keras
 *.pkl
 *.pt
