@@ -15,6 +15,11 @@ EYESENTINEL is a high-performance, dark-themed clinical triage and multi-disease
 * **Automated Clinical PDF Reporting**: Generates downloadable medical audit reports instantly using FPDF2.
 
 ---
+## Demo link
+
+https://eyesentinel-triage.onrender.com/
+
+---
 
 ## System Architecture
 
