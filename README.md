@@ -1,3 +1,5 @@
+
+
 # EYESENTINEL | Clinical Triage & Ocular Diagnosis System
 
 EYESENTINEL is a high-performance, dark-themed clinical triage and multi-disease ocular diagnostic application built using Streamlit, TensorFlow/Keras, Plotly, and FPDF2. It is optimized for rapid cloud deployment (such as Render) and is designed to assist clinicians in screening retinal fundus images for Glaucoma, Diabetic Retinopathy, Cataract, and normal baseline variations.
@@ -11,6 +13,39 @@ EYESENTINEL is a high-performance, dark-themed clinical triage and multi-disease
 * **Multiclass Ocular Expansion**: Supports both binary glaucoma screening and a multi-disease classification scope.
 * **Interactive Analytics Dashboard**: Built with Plotly to visualize triage volume trends, disease distributions, and model performance metrics.
 * **Automated Clinical PDF Reporting**: Generates downloadable medical audit reports instantly using FPDF2.
+
+---
+
+## System Architecture
+
+```mermaid
+graph TD
+    A[Kaggle Dataset: Fondo de Ojo] -->|Images + Labels| B(Preprocessing Pipeline)
+    B -->|Train/Validation Split| C(Custom CNN Training)
+    C -->|Model Weights| D[(models/eye_disease_model.h5)]
+
+    subgraph Inference
+        G[User Uploads Fundus Image] --> E[Streamlit App: app.py]
+        D -->|Load Weights| E
+        E -->|Resize and Normalize| H[TensorFlow Inference Engine]
+        H -->|Sigmoid Probability + Grad-CAM| I[Clinical Triage Output]
+    end
+
+    subgraph Output
+        I --> J[Plotly Analytics Dashboard]
+        I --> K[FPDF2 Clinical PDF Report]
+    end
+
+    subgraph Deployment
+        E -->|Cloud Deploy| F[Render Platform]
+    end
+```
+
+GitHub renders this diagram automatically wherever the README is viewed. The pipeline runs in three phases:
+
+1. **Data + training**: the Kaggle fundus dataset is preprocessed and used to train the custom CNN, producing the `eye_disease_model.h5` artifact.
+2. **Inference**: the Streamlit app loads that artifact, takes a user-uploaded fundus image, and runs it through the TensorFlow inference engine to produce a risk score plus a Grad-CAM heatmap.
+3. **Output + deployment**: results feed the Plotly dashboard and FPDF2 report generator, with the whole app deployed on Render.
 
 ---
 
