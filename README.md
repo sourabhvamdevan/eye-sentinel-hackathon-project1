@@ -111,3 +111,9 @@ To evaluate model metrics (Confusion Matrix, ROC-AUC score, and Classification R
 python evaluation.py
 
 ```
+
+### Benchmark Results
+
+![Model comparison across precision, recall, F1-score, and accuracy](screenshots/img_13_cell28.png)
+
+The chart above compares all evaluated models on binary detection (left) and the top 4 performers on a radar plot across Precision, Recall, F1-Score, and Accuracy (right).
