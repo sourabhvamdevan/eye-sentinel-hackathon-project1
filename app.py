@@ -173,7 +173,7 @@ def generate_pdf_report(patient_id, diagnosis_text, conf_score):
     
     pdf.set_font("helvetica", "", 10)
     pdf.set_text_color(100, 100, 100)
-    pdf.cell(0, 8, "AI-Powered Ocular Screening & Triage System", ln=True, align="center")
+    pdf.cell(0, 8, "AI-Powered Ocular Screening & Triage System", ln=True, align="C")
     pdf.ln(10)
     
     pdf.set_font("helvetica", "B", 12)
