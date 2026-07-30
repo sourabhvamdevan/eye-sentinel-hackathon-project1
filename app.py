@@ -88,36 +88,22 @@ def load_trained_model():
     model_dir = "models"
     model_path = os.path.join(model_dir, "eye_disease_model.h5")
     
+    # Apne Google Drive sharing link ka sirf FILE_ID yahan paste karein
     file_id = "1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP"
-    url = "https://drive.google.com/file/d/1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP/view?usp=drive_link"
+    url = f'https://drive.google.com/file/d/1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP/view?usp=drive_link'
     
-    # Force re-download if file doesn't exist or is invalid/corrupt (< 50KB)
+    # Agar file exist nahi karti ya size 50KB se kam (corrupt/HTML) hai toh download karein
     if not os.path.exists(model_path) or os.path.getsize(model_path) < 50000:
         os.makedirs(model_dir, exist_ok=True)
-        with st.spinner("Downloading diagnostic model weights from Google Drive..."):
+        with st.spinner("Downloading large model weights securely via gdown..."):
             try:
-                session = requests.Session()
-                response = session.get(url, params={'id': file_id}, stream=True)
-                
-                token = None
-                for key, value in response.cookies.items():
-                    if key.startswith('download_warning'):
-                        token = value
-                        break
-                
-                if token:
-                    params = {'id': file_id, 'confirm': token}
-                    response = session.get(url, params=params, stream=True)
-                
-                with open(model_path, "wb") as f:
-                    for chunk in response.iter_content(chunk_size=32768):
-                        if chunk:
-                            f.write(chunk)
+                # gdown handles Google Drive virus-warning bypass automatically
+                gdown.download(url, model_path, quiet=False, fuzzy=True)
             except Exception as e:
-                st.error(f"Failed to download model weights: {e}")
+                st.error(f"Download failed: {e}")
                 return None
 
-    # Final verification before loading weights
+    # Final verification before loading weights into Keras
     if os.path.exists(model_path) and os.path.getsize(model_path) > 50000:
         try:
             inputs = tf.keras.Input(shape=(256, 256, 3))
@@ -136,13 +122,12 @@ def load_trained_model():
             model.load_weights(model_path)
             return model
         except Exception as e:
-            st.error(f"Model weights loading error (corrupt file): {e}")
-            # Delete corrupt file so it re-downloads next time
+            st.error(f"Model weights parsing error: {e}")
             if os.path.exists(model_path):
                 os.remove(model_path)
             return None
     else:
-        st.error("Downloaded file is invalid or too small. Please verify Google Drive link permissions ('Anyone with the link can view').")
+        st.error("Downloaded file is invalid. Ensure Google Drive sharing is set to 'Anyone with the link can view'.")
         if os.path.exists(model_path):
             os.remove(model_path)
         return None
