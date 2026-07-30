@@ -86,19 +86,37 @@ def load_trained_model():
     model_dir = "models"
     model_path = os.path.join(model_dir, "eye_disease_model.h5")
     
-    if not os.path.exists(model_path):
+    # Yahan apne Google Drive ki file ka sirf FILE_ID paste karein
+    file_id = "1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP"
+    url = "https://drive.google.com/file/d/1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP/view?usp=sharing"
+    
+    if not os.path.exists(model_path) or os.path.getsize(model_path) < 10000:
         os.makedirs(model_dir, exist_ok=True)
-      
-        cloud_model_url = "https://drive.google.com/drive/folders/1bp5PMZ9BTn2t_3q4ImJ1qVG7zdrSDQN4?usp=sharing"
-        
         with st.spinner("Downloading diagnostic model weights from secure cloud storage..."):
             try:
-                urllib.request.urlretrieve(cloud_model_url, model_path)
+                session = requests.Session()
+                response = session.get(url, params={'id': file_id}, stream=True)
+                
+                # Google Drive large file virus-scan warning token bypass
+                token = None
+                for key, value in response.cookies.items():
+                    if key.startswith('download_warning'):
+                        token = value
+                        break
+                
+                if token:
+                    params = {'id': file_id, 'confirm': token}
+                    response = session.get(url, params=params, stream=True)
+                
+                with open(model_path, "wb") as f:
+                    for chunk in response.iter_content(chunk_size=32768):
+                        if chunk:
+                            f.write(chunk)
             except Exception as e:
                 st.error(f"Failed to download model weights from cloud: {e}")
                 return None
 
-    if os.path.exists(model_path):
+    if os.path.exists(model_path) and os.path.getsize(model_path) > 10000:
         inputs = tf.keras.Input(shape=(256, 256, 3))
         x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', name='conv2d_0')(inputs)
         x = tf.keras.layers.MaxPooling2D(2, 2)(x)
@@ -114,7 +132,9 @@ def load_trained_model():
         model = tf.keras.Model(inputs=inputs, outputs=outputs, name="glaucoma_cnn")
         model.load_weights(model_path)
         return model
-    return None
+    else:
+        st.error("Downloaded model file is invalid, empty, or permissions are restricted.")
+        return None
 
 model = load_trained_model()
 
