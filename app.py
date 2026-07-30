@@ -169,7 +169,7 @@ def generate_pdf_report(patient_id, diagnosis_text, conf_score):
     pdf.add_page()
     pdf.set_font("helvetica", "B", 18)
     pdf.set_text_color(15, 23, 42)
-    pdf.cell(0, 10, "EYESENTINEL - Clinical Diagnostic Report", ln=True, align="center")
+    pdf.cell(0, 10, "EYESENTINEL - Clinical Diagnostic Report", ln=True, align="C")
     
     pdf.set_font("helvetica", "", 10)
     pdf.set_text_color(100, 100, 100)
