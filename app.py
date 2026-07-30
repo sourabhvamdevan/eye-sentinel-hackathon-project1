@@ -88,18 +88,17 @@ def load_trained_model():
     model_dir = "models"
     model_path = os.path.join(model_dir, "eye_disease_model.h5")
     
-    # Yahan apne Google Drive ki file ka sirf FILE_ID paste karein
     file_id = "1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP"
-    url = "https://drive.google.com/file/d/1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP/view?usp=sharing"
+    url = "https://drive.google.com/file/d/1dsWMoDPbQVf9yvp-oyzAQIdLsGlvdjeP/view?usp=drive_link"
     
-    if not os.path.exists(model_path) or os.path.getsize(model_path) < 10000:
+    # Force re-download if file doesn't exist or is invalid/corrupt (< 50KB)
+    if not os.path.exists(model_path) or os.path.getsize(model_path) < 50000:
         os.makedirs(model_dir, exist_ok=True)
-        with st.spinner("Downloading diagnostic model weights from secure cloud storage..."):
+        with st.spinner("Downloading diagnostic model weights from Google Drive..."):
             try:
                 session = requests.Session()
                 response = session.get(url, params={'id': file_id}, stream=True)
                 
-                # Google Drive large file virus-scan warning token bypass
                 token = None
                 for key, value in response.cookies.items():
                     if key.startswith('download_warning'):
@@ -115,27 +114,37 @@ def load_trained_model():
                         if chunk:
                             f.write(chunk)
             except Exception as e:
-                st.error(f"Failed to download model weights from cloud: {e}")
+                st.error(f"Failed to download model weights: {e}")
                 return None
 
-    if os.path.exists(model_path) and os.path.getsize(model_path) > 10000:
-        inputs = tf.keras.Input(shape=(256, 256, 3))
-        x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', name='conv2d_0')(inputs)
-        x = tf.keras.layers.MaxPooling2D(2, 2)(x)
-        x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', name='conv2d_1')(x)
-        x = tf.keras.layers.MaxPooling2D(2, 2)(x)
-        conv_out = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', name='conv2d_2')(x)
-        x = tf.keras.layers.MaxPooling2D(2, 2)(conv_out)
-        x = tf.keras.layers.Flatten()(x)
-        x = tf.keras.layers.Dense(128, activation='relu')(x)
-        x = tf.keras.layers.Dropout(0.5)(x)
-        outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
-        
-        model = tf.keras.Model(inputs=inputs, outputs=outputs, name="glaucoma_cnn")
-        model.load_weights(model_path)
-        return model
+    # Final verification before loading weights
+    if os.path.exists(model_path) and os.path.getsize(model_path) > 50000:
+        try:
+            inputs = tf.keras.Input(shape=(256, 256, 3))
+            x = tf.keras.layers.Conv2D(32, (3, 3), activation='relu', name='conv2d_0')(inputs)
+            x = tf.keras.layers.MaxPooling2D(2, 2)(x)
+            x = tf.keras.layers.Conv2D(64, (3, 3), activation='relu', name='conv2d_1')(x)
+            x = tf.keras.layers.MaxPooling2D(2, 2)(x)
+            conv_out = tf.keras.layers.Conv2D(128, (3, 3), activation='relu', name='conv2d_2')(x)
+            x = tf.keras.layers.MaxPooling2D(2, 2)(conv_out)
+            x = tf.keras.layers.Flatten()(x)
+            x = tf.keras.layers.Dense(128, activation='relu')(x)
+            x = tf.keras.layers.Dropout(0.5)(x)
+            outputs = tf.keras.layers.Dense(1, activation='sigmoid')(x)
+            
+            model = tf.keras.Model(inputs=inputs, outputs=outputs, name="glaucoma_cnn")
+            model.load_weights(model_path)
+            return model
+        except Exception as e:
+            st.error(f"Model weights loading error (corrupt file): {e}")
+            # Delete corrupt file so it re-downloads next time
+            if os.path.exists(model_path):
+                os.remove(model_path)
+            return None
     else:
-        st.error("Downloaded model file is invalid, empty, or permissions are restricted.")
+        st.error("Downloaded file is invalid or too small. Please verify Google Drive link permissions ('Anyone with the link can view').")
+        if os.path.exists(model_path):
+            os.remove(model_path)
         return None
 
 model = load_trained_model()
