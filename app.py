@@ -239,7 +239,7 @@ elif selected_view == "Diagnostic Workspace":
         patient_id_input = st.text_input("Patient ID / Reference Name", value="PAT-8921")
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
-            st.image(image, caption="Uploaded Scan Preview", use_container_width=True)
+            st.image(image, caption="Uploaded Scan Preview")
 
     with result_col:
         st.markdown("#### Diagnostic Evaluation & Grad-CAM Panel")
