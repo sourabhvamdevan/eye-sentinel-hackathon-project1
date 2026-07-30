@@ -3,6 +3,7 @@ matplotlib.use('Agg')
 
 import streamlit as st
 import os
+import requests
 import urllib.request
 import numpy as np
 from PIL import Image
