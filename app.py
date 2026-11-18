@@ -247,7 +247,7 @@ elif selected_view == "Diagnostic Workspace":
             if st.button("Run Deep Learning Inference & Grad-CAM", type="primary", use_container_width=True):
                 if model is not None:
                     with st.spinner("Analyzing structural optic disc features & generating heatmap..."):
-                        img_resized = image.resize((256, 256))
+                        img_resized = image.convert("RGB").resize((256, 256))
                         img_array = np.array(img_resized) / 255.0
                         img_input = np.expand_dims(img_array, axis=0)
                         
