@@ -238,7 +238,7 @@ elif selected_view == "Diagnostic Workspace":
         uploaded_file = st.file_uploader("Choose retinal image...", type=["jpg", "jpeg", "png"])
         patient_id_input = st.text_input("Patient ID / Reference Name", value="PAT-8921")
         if uploaded_file is not None:
-            image = Image.open(uploaded_file)
+            image = Image.open(uploaded_file).convert("RGB")
             st.image(image, caption="Uploaded Scan Preview")
 
     with result_col:
@@ -247,7 +247,7 @@ elif selected_view == "Diagnostic Workspace":
             if st.button("Run Deep Learning Inference & Grad-CAM", type="primary", use_container_width=True):
                 if model is not None:
                     with st.spinner("Analyzing structural optic disc features & generating heatmap..."):
-                        img_resized = image.resize((256, 256))
+                        img_resized = image.convert("RGB").resize((256, 256))
                         img_array = np.array(img_resized) / 255.0
                         img_input = np.expand_dims(img_array, axis=0)
                         
